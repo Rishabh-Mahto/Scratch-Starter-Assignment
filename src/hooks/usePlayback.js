@@ -80,7 +80,7 @@ export function usePlayback() {
     }
   }
 
-  function checkCollision() {
+  async function checkCollision() {
     const { sprites } = stateRef.current;
     const ids = Object.keys(sprites).slice(0, 2);
     const [a, b] = ids;
@@ -90,8 +90,16 @@ export function usePlayback() {
     const dy = sa.y - sb.y;
     const dist = Math.hypot(dx, dy);
     const threshold = 50;
+
     if (dist < threshold) {
       dispatch({ type: "SWAP_QUEUES", payload: [a, b] });
+
+      // Wait for the state to update
+      await wait(100);
+
+      await Promise.all([runQueueFor(a), runQueueFor(b)]);
+
+      dispatch({ type: "RESET_COLLISION" });
     }
   }
 

@@ -31,14 +31,15 @@ function reducer(state, action) {
 
     case "SWAP_QUEUES": {
       const [a, b] = action.payload;
-      const qA = state.sprites[a].queue;
-      const qB = state.sprites[b].queue;
+      const spriteA = state.sprites[a];
+      const spriteB = state.sprites[b];
+
       return {
         ...state,
         sprites: {
           ...state.sprites,
-          [a]: { ...state.sprites[a], queue: [...qB] },
-          [b]: { ...state.sprites[b], queue: [...qA] },
+          [a]: { ...spriteA, queue: [...spriteB.queue] },
+          [b]: { ...spriteB, queue: [...spriteA.queue] },
         },
         collided: true,
       };
@@ -146,6 +147,10 @@ function reducer(state, action) {
           },
         },
       };
+    }
+
+    case "RESET_COLLISION": {
+      return { ...state, collided: false };
     }
 
     case "RESET_SPRITE": {
