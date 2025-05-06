@@ -18,9 +18,15 @@ function clamp(value, min, max) {
 }
 
 export default function PreviewArea() {
-  const { sprites, heroMode } = useAppState();
+  const { sprites, heroMode, collided } = useAppState();
   const dispatch = useAppDispatch();
   const { runAll } = usePlayback();
+
+  useEffect(() => {
+    if (collided) {
+      runAll();
+    }
+  }, [collided]);
 
   const playAreaRef = useRef(null);
   const initializedRef = useRef(false);

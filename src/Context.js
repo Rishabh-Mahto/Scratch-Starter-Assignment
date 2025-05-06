@@ -29,18 +29,19 @@ function reducer(state, action) {
     case "TOGGLE_HERO":
       return { ...state, heroMode: !state.heroMode, collided: false };
 
+    case "SET_COLLIDED":
+      return { ...state, collided: action.payload };
+
     case "SWAP_QUEUES": {
       const [a, b] = action.payload;
-      const spriteA = state.sprites[a];
-      const spriteB = state.sprites[b];
-
+      const spritesCopy = { ...state.sprites };
+      const qA = spritesCopy[a].queue;
+      const qB = spritesCopy[b].queue;
+      spritesCopy[a] = { ...spritesCopy[a], queue: [...qB] };
+      spritesCopy[b] = { ...spritesCopy[b], queue: [...qA] };
       return {
         ...state,
-        sprites: {
-          ...state.sprites,
-          [a]: { ...spriteA, queue: [...spriteB.queue] },
-          [b]: { ...spriteB, queue: [...spriteA.queue] },
-        },
+        sprites: spritesCopy,
         collided: true,
       };
     }
@@ -147,10 +148,6 @@ function reducer(state, action) {
           },
         },
       };
-    }
-
-    case "RESET_COLLISION": {
-      return { ...state, collided: false };
     }
 
     case "RESET_SPRITE": {
