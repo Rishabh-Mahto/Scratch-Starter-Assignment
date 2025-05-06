@@ -7,16 +7,23 @@ export default function MidArea() {
   const dispatch = useAppDispatch();
   const current = sprites[selectedSpriteId];
 
-  function handleParamChange(blockId, key, value) {
+  function handleParamChange(blockId, key, value, isText = false) {
     dispatch({
       type: "UPDATE_BLOCK_PARAMS",
       payload: {
         spriteId: selectedSpriteId,
         blockId,
-        params: { [key]: value },
+        params: { [key]: isText ? value : Number(value) },
       },
     });
   }
+
+  const getCustomLabel = (block, key) => {
+    if (block.type !== "say" && block.type !== "think") return key;
+    if (block.type === "say" || block.type === "think") {
+      return key === "for" ? "" : key;
+    }
+  };
 
   return (
     <div className="flex flex-col flex-1 p-4 bg-gray-50">
@@ -60,7 +67,9 @@ export default function MidArea() {
                       </span>
                       {Object.entries(block.params).map(([k, v]) => (
                         <label key={k} className="mr-4">
-                          <span className="mr-1">{k}:</span>
+                          <span className="mr-1">
+                            {getCustomLabel(block, k)}
+                          </span>
                           <input
                             type={typeof v === "string" ? "text" : "number"}
                             value={v}
@@ -68,7 +77,8 @@ export default function MidArea() {
                               handleParamChange(
                                 block.id,
                                 k,
-                                Number(e.target.value)
+                                e.target.value,
+                                typeof v === "string"
                               )
                             }
                             className="w-16 p-1 border rounded"
